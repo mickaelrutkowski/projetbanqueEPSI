@@ -4,16 +4,18 @@ import javax.swing.*;
 import java.sql.*;
 import java.util.Scanner;
 
-public class client {
+public class client extends agence {
     private int IdClient = 0;
-    private String Nom = null;
-    private String prenom = null;
+    private String NomClient = null;
+    private String prenomClient = null;
     private String AdresseClient = null;
     private String VilleClient = null;
     private Connection con;
     private Statement st;
     private ResultSet rs;
     Scanner key = new Scanner(System.in);
+    private String DepartementClient = null;
+    private int IdAgence;
 
     public client() {
 
@@ -34,24 +36,31 @@ public class client {
         try {
 
             System.out.print("Saisissez le nom  : ");
-            this.Nom = key.nextLine();
+            this.NomClient = key.nextLine();
             System.out.print("Saisissez le prenom  : ");
-            this.prenom = key.nextLine();
+            this.prenomClient = key.nextLine();
             System.out.print("Saisissez l'adresse  : ");
             this.AdresseClient = key.nextLine();
+            System.out.print("Saisissez le departement  : ");
+            this.DepartementClient = key.nextLine();
             System.out.print("Saisissez la ville  : ");
             this.VilleClient = key.nextLine();
+            System.out.print("Saisissez l'agence : ");
+            this.IdAgence = Integer.parseInt(key.nextLine());
 
-            String query = "INSERT INTO client VALUES('" + this.IdClient + "','" + this.Nom + "','" + this.prenom + "','" + this.AdresseClient + "','" + this.VilleClient + "');";
+            String query = "INSERT INTO clients VALUES('" + this.IdClient + "','" + this.NomClient + "','" + this.prenomClient + "','" + this.AdresseClient + "','" + this.DepartementClient + "','" + this.VilleClient + "','" + this.IdAgence + "');";
             st.executeUpdate(query);
 
             System.out.println("-----------------------------");
             System.out.println("Client inseret dans la base de donée");
-            System.out.println("Nom Client : " + this.Nom);
-            System.out.println("Prenom Client : " + this.prenom);
+            System.out.println("Nom Client : " + this.NomClient);
+            System.out.println("Prenom Client : " + this.prenomClient);
             System.out.println("Adresse :  " + this.AdresseClient);
+            System.out.println("DepartementClient :  " + this.DepartementClient);
             System.out.println("Ville :  " + this.VilleClient);
+            System.out.println("Agence :  " + this.IdAgence);
             System.out.println("------------------------------\n");
+
             return true;
 
         } catch (Exception e) {
@@ -66,7 +75,7 @@ public class client {
 
             // notre requête SQL SELECT.
             // si vous n'avez besoin que de quelques colonnes, spécifiez-les par nom au lieu d'utiliser "*"
-            String query = "SELECT * FROM client";
+            String query = "SELECT * FROM clients";
 
             // crée l'instruction java
             Statement st = con.createStatement();
@@ -80,10 +89,12 @@ public class client {
                 String Nom = rs.getString("Nom");
                 String Prenom = rs.getString("Prenom");
                 String Adresse = rs.getString("AdresseClient");
+                String DepartementClient = rs.getString("DepartementClient");
                 String Ville = rs.getString("VilleClient");
+                int IdAgence = rs.getInt("IdAgence");
 
                 // Afficher les résultats
-                System.out.format("%s, %s, %s, %s, %s\n", IdClient, Nom, Prenom, Adresse, Ville);
+                System.out.format("%s, %s, %s, %s, %s,%s, %s\n", IdClient, Nom, Prenom, Adresse,DepartementClient, Ville, IdAgence);
             }
             st.close();
         } catch (Exception e) {
@@ -111,6 +122,7 @@ public class client {
                         "\nPrenom Client : " + Prenom +
                         "\nAdresse : " + Adresse +
                         "\nVille Client : " + Ville);
+
             }
             st.close();
         } catch (SQLException ex) {
@@ -151,5 +163,13 @@ public class client {
 
     public int getIdClient() {
         return IdClient;
+    }
+
+    public String getNom() {
+        return NomClient;
+    }
+
+    public void setNom(String nom) {
+        NomClient = nom;
     }
 }

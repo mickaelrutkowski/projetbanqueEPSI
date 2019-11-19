@@ -9,15 +9,15 @@ import java.util.Scanner;
 
 public class agence {
 
-    private int NumeroAgence;
+    private int idAgence = 0;
     private String Libelle;
     private String AdresseAgence;
     private String VilleAgence;
-    private int cpt = 0;
     private Connection con;
     private Statement st;
     private ResultSet rs;
     static Scanner key = new Scanner(System.in);
+    private String DepartementAgence;
 
     public agence() {
         try {
@@ -31,18 +31,6 @@ public class agence {
         }
     }
 
-    public int getNumeroAgence() {
-        return NumeroAgence;
-    }
-
-    public String getAdresseAgence() {
-        return AdresseAgence;
-    }
-
-    public String getLibelle() {
-        return Libelle;
-    }
-
     // Insérez un nouveau client dans la base de données
     public boolean insertAgence() {
 
@@ -52,18 +40,15 @@ public class agence {
             this.Libelle = key.nextLine();
             System.out.print("Saisissez l'adresse de l'agence   : ");
             this.AdresseAgence = key.nextLine();
+            System.out.print("Saisissez lae departement  : ");
+            this.DepartementAgence = key.nextLine();
             System.out.print("Saisissez la ville  : ");
             this.VilleAgence = key.nextLine();
 
-            String query = "INSERT INTO agence VALUES('" + this.NumeroAgence+ "','" + this.Libelle + "','" + this.AdresseAgence+ "','" + this.VilleAgence + "');";
+            String query = "INSERT INTO agence VALUES('" + this.idAgence+ "','" + this.Libelle + "','" + this.AdresseAgence + "','" + this.DepartementAgence + "','" + this.VilleAgence + "');";
             st.executeUpdate(query);
 
-            System.out.println("-----------------------------");
-            System.out.println("agence inseret dans la base de donée");
-            System.out.println("libelle : " + this.Libelle);
-            System.out.println("Adresse agence : " + this.AdresseAgence);
-            System.out.println("Ville agence :  " + this.VilleAgence);
-            System.out.println("------------------------------\n");
+            SelectAgence();
             return true;
 
         } catch (Exception e) {
@@ -88,14 +73,16 @@ public class agence {
 
             // itérer dans le jeu de résultats java
             while (rs.next()) {
-                int NumeroAgence = rs.getInt("NumeroAgence");
+                int idAgence = rs.getInt("idAgence");
                 String Libelle = rs.getString("Libelle");
                 String AdresseAgence = rs.getString("AdresseAgence");
+                String DepartementAgence = rs.getString("DepartementAgence");
                 String VilleAgence = rs.getString("VilleAgence");
 
-
                 // Afficher les résultats
-                System.out.format("%s, %s, %s, %s\n", NumeroAgence, Libelle, AdresseAgence, VilleAgence);
+                System.out.println("Agence : ");
+                System.out.format("%s, %s, %s, %s, %s\n","NumeroAgence : " + idAgence,"libelle : " + Libelle, "AdresseAgence : " + AdresseAgence,"DepartementAgence : " + DepartementAgence, "VilleAgence : " + VilleAgence);
+                System.out.println("-------------------------");
             }
             st.close();
         } catch (Exception e) {
@@ -159,5 +146,15 @@ public class agence {
             return false;
         }
     }
+    public int getNumeroAgence() {
+        return idAgence;
+    }
 
+    public String getAdresseAgence() {
+        return AdresseAgence;
+    }
+
+    public String getLibelle() {
+        return Libelle;
+    }
 }
