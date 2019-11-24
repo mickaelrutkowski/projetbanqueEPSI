@@ -4,18 +4,22 @@ import javax.swing.*;
 import java.sql.*;
 import java.util.Scanner;
 
-public class client extends agence {
+public class client {
+
     private int IdClient = 0;
     private String NomClient = null;
     private String prenomClient = null;
     private String AdresseClient = null;
+    private String DepartementClient = null;
     private String VilleClient = null;
+    private int IdAgence;
     private Connection con;
     private Statement st;
     private ResultSet rs;
     Scanner key = new Scanner(System.in);
-    private String DepartementClient = null;
-    private int IdAgence;
+    boolean finis = true;
+
+//*************************************************************************************************************
 
     public client() {
 
@@ -30,11 +34,67 @@ public class client extends agence {
         }
     }
 
+//************************************************************************************************************
+
+    public void interactionClient() {
+
+        while (finis) {
+            System.out.println("");
+            System.out.println("         __________________________________________      ");
+            System.out.println("                       [| Bienvenu  |]                   ");
+            System.out.println("      +-------------------  Menu  --------------------+  ");
+            System.out.println("      | Quelle operation voulez-vous effectuer?       |  ");
+            System.out.println("      |  1) Ajouter un Client                         |  ");
+            System.out.println("      |  2) Afficher toute les Clients                |  ");
+            System.out.println("      |  3) Afficher un Client                        |  ");
+            System.out.println("      |  4) Modifier Client                           |  ");
+            System.out.println("      |  5) supprime Client                           |  ");
+            System.out.println("      |                                               |  ");
+            System.out.println("      |  6) Menu Principal                            |  ");
+            System.out.println("      +-----------------------------------------------+  ");
+            System.out.print("Votre choix: ");
+            String reponse = key.nextLine();
+            System.out.println();
+
+            switch (reponse) {
+                case "1":
+                    insertClient();
+                    break;
+
+                case "2":
+                    selectClient();
+                    break;
+
+                case "3":
+                    selectIdS();
+                    break;
+
+                case "4":
+                    updateClient();
+                    break;
+
+                case "5":
+                    deleteClient();
+                    break;
+
+                case "6":
+                    Main MenuP = new Main();
+                    MenuP.MenuP();
+                    break;
+
+                default:
+                    System.out.println("Erreur de saisi clavier !! \n");
+                    break;
+            }
+        }
+    }
+
+//**********************************************************************************************************
     // Insérez un nouveau client dans la base de données
-    public boolean insert() {
+
+    public boolean insertClient() {
 
         try {
-
             System.out.print("Saisissez le nom  : ");
             this.NomClient = key.nextLine();
             System.out.print("Saisissez le prenom  : ");
@@ -50,17 +110,7 @@ public class client extends agence {
 
             String query = "INSERT INTO clients VALUES('" + this.IdClient + "','" + this.NomClient + "','" + this.prenomClient + "','" + this.AdresseClient + "','" + this.DepartementClient + "','" + this.VilleClient + "','" + this.IdAgence + "');";
             st.executeUpdate(query);
-
-            System.out.println("-----------------------------");
-            System.out.println("Client inseret dans la base de donée");
-            System.out.println("Nom Client : " + this.NomClient);
-            System.out.println("Prenom Client : " + this.prenomClient);
-            System.out.println("Adresse :  " + this.AdresseClient);
-            System.out.println("DepartementClient :  " + this.DepartementClient);
-            System.out.println("Ville :  " + this.VilleClient);
-            System.out.println("Agence :  " + this.IdAgence);
-            System.out.println("------------------------------\n");
-
+            selectClient();
             return true;
 
         } catch (Exception e) {
@@ -69,32 +119,26 @@ public class client extends agence {
         }
     }
 
+//*********************************************************************************************************************
+
     public void selectClient() {
 
         try {
-
-            // notre requête SQL SELECT.
-            // si vous n'avez besoin que de quelques colonnes, spécifiez-les par nom au lieu d'utiliser "*"
             String query = "SELECT * FROM clients";
-
-            // crée l'instruction java
             Statement st = con.createStatement();
-
-            // exécute la requête et obtient un ensemble de résultats java
             ResultSet rs = st.executeQuery(query);
 
-            // itérer dans le jeu de résultats java
             while (rs.next()) {
                 int IdClient = rs.getInt("IdClient");
-                String Nom = rs.getString("Nom");
-                String Prenom = rs.getString("Prenom");
+                String Nom = rs.getString("NomClient");
+                String Prenom = rs.getString("PrenomClient");
                 String Adresse = rs.getString("AdresseClient");
                 String DepartementClient = rs.getString("DepartementClient");
                 String Ville = rs.getString("VilleClient");
                 int IdAgence = rs.getInt("IdAgence");
 
                 // Afficher les résultats
-                System.out.format("%s, %s, %s, %s, %s,%s, %s\n", IdClient, Nom, Prenom, Adresse,DepartementClient, Ville, IdAgence);
+                System.out.format("%s, %s, %s, %s, %s,%s, %s\n", IdClient, Nom, Prenom, Adresse, DepartementClient, Ville, IdAgence);
             }
             st.close();
         } catch (Exception e) {
@@ -103,56 +147,98 @@ public class client extends agence {
         }
     }
 
+//**************************************************************************************************************
     // Résultats de la recherche avec les données des disques avec un choix de génération
-    public void selectId(int para) {
+
+    public void selectIdClient(int para) {
 
         try {
-
-            String query = "SELECT * FROM client WHERE IdClient = '" + para + "'";
+            String query = "SELECT * FROM clients WHERE IdClient = '" + para + "'";
             rs = st.executeQuery(query);
+
             while (rs.next()) {
-                String Nom = rs.getString("Nom");
-                String Prenom = rs.getString("Prenom");
-                String Adresse = rs.getString("AdresseClient");
-                String Ville = rs.getString("VilleClient");
                 int IdClient = rs.getInt("IdClient");
+                String NomClient = rs.getString("NomClient");
+                String PrenomClient = rs.getString("PrenomClient");
+                String AdresseClient = rs.getString("AdresseClient");
+                String DepartementClient = rs.getString("DepartementClient");
+                String VilleClient = rs.getString("VilleClient");
+                int IdAgence = rs.getInt("IdAgence");
                 System.out.format(
                         "\nId Client : " + IdClient +
-                        "\nNom Client : " + Nom +
-                        "\nPrenom Client : " + Prenom +
-                        "\nAdresse : " + Adresse +
-                        "\nVille Client : " + Ville);
-
+                                "\nNom Client : " + NomClient +
+                                "\nPrenom Client : " + PrenomClient +
+                                "\nAdresse : " + AdresseClient +
+                                "\nDepartement : " + DepartementClient +
+                                "\nVille Client : " + VilleClient +
+                                "\nId Agence : " + IdAgence );
             }
             st.close();
         } catch (SQLException ex) {
-             ex.printStackTrace();
+            ex.printStackTrace();
         }
 
     }
 
-    public boolean delete(int id) {
+    //*********************************************************************************
+
+    public void selectIdS() {
+
+        System.out.print("Saisissez l'Id du Client  : ");
+        this.IdClient = Integer.parseInt(key.nextLine());
 
         try {
+            String query = "SELECT * FROM clients WHERE IdClient = '" + IdClient + "'";
+            rs = st.executeQuery(query);
 
-            String query = "DELETE FROM client WHERE IdClient = '" + id + "'";
-            st.executeUpdate(query);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            while (rs.next()) {
+                int IdClient = rs.getInt("IdClient");
+                String NomClient = rs.getString("NomClient");
+                String PrenomClient = rs.getString("PrenomClient");
+                String AdresseClient = rs.getString("AdresseClient");
+                String DepartementClient = rs.getString("DepartementClient");
+                String VilleClient = rs.getString("VilleClient");
+                int IdAgence = rs.getInt("IdAgence");
+                System.out.format(
+                        "\nId Client : " + IdClient +
+                                "\nNom Client : " + NomClient +
+                                "\nPrenom Client : " + PrenomClient +
+                                "\nAdresse : " + AdresseClient +
+                                "\nDepartement : " + DepartementClient +
+                                "\nVille Client : " + VilleClient +
+                                "\nId Agence : " + IdAgence );
+            }
+            st.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public boolean update(int id, String Nom, String Prenom, String AdresseClient, String VilleClient) {
+    //*****************************************************************************
+
+    public boolean updateClient() {
+
+        System.out.print("Saisissez l'Id du Client: ");
+        this.IdClient = Integer.parseInt(key.nextLine());
+        System.out.print("Saisissez le nom : ");
+        this.NomClient = key.nextLine();
+        System.out.print("Saisissez le prenom : ");
+        this.prenomClient = key.nextLine();
+        System.out.print("Saisissez l'adresse  : ");
+        this.AdresseClient = key.nextLine();
+        System.out.print("Saisissez le departement  : ");
+        this.DepartementClient = key.nextLine();
+        System.out.print("Saisissez la ville  : ");
+        this.VilleClient = key.nextLine();
+        System.out.print("Saisissez l'agence : ");
+        this.IdAgence = Integer.parseInt(key.nextLine());
 
         try {
-
             String query = "UPDATE client SET"
-                    + " Nom = '" + Nom + "',"
-                    + " Prenom = '" + Prenom + "',"
+                    + " Nom = '" + NomClient + "',"
+                    + " Prenom = '" + prenomClient + "',"
                     + " AdresseClient = '" + AdresseClient + "',"
-                    + " VilleClient = '" + VilleClient + "' WHERE IdClient = '" + id + "';";
+                    + " VilleClient = '" + VilleClient + "' WHERE IdClient = '" + IdClient + "';";
             st.executeUpdate(query);
             return true;
         } catch (Exception e) {
@@ -160,6 +246,25 @@ public class client extends agence {
             return false;
         }
     }
+
+//********************************************************************************************************
+
+    public boolean deleteClient() {
+
+        System.out.print("Saisissez l'Id du Client a supprimer : ");
+        this.IdClient = Integer.parseInt(key.nextLine());
+
+        try {
+            String query = "DELETE FROM clients WHERE IdClient = '" + IdClient + "'";
+            st.executeUpdate(query);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //***********************************************************************************************
 
     public int getIdClient() {
         return IdClient;
@@ -171,5 +276,9 @@ public class client extends agence {
 
     public void setNom(String nom) {
         NomClient = nom;
+    }
+
+    public String getNomClient() {
+        return NomClient;
     }
 }

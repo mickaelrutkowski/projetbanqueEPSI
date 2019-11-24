@@ -5,22 +5,24 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Scanner;
 
-public class transaction extends compte {
+import static java.time.LocalDateTime.now;
+
+public class transaction {
 
     private Connection con;
     private Statement st;
     private ResultSet rs;
     private int IdTRansaction = 0;
     private float MontantTransaction;
-    private String DateTransaction;
     private int IdCompte_1;
     private int IdCompte_2;
     Scanner key = new Scanner(System.in);
+    private float Somme;
 
-    public transaction()
-    {
+    public transaction() {
 
         try {
             if ((con = connection.getConexionMYSQL()) == null) {
@@ -32,45 +34,37 @@ public class transaction extends compte {
             e.printStackTrace();
         }
     }
+
     //********************* Insertion *********************************************
     // Insérez un nouveau client dans la base de données
-    public boolean insertTransaction() {
+
+/*   public boolean insertTransaction() {
 
         try {
-
-            System.out.print("Saisissez le Montant de la Transaction  : ");
-            this.MontantTransaction = Float.parseFloat(key.nextLine());
-            System.out.print("Saisissez la date : ");
-            this.DateTransaction = String.valueOf(key.nextLine());
-            System.out.print("Saisissez le Numero de compte a debiter  : ");
-            this.IdCompte_1 = Integer.parseInt(key.nextLine());
-            System.out.print("Saisissez le Numero de compte a crediter  : ");
-            this.IdCompte_2 = Integer.parseInt(key.nextLine());
-
-            String query = "INSERT INTO transaction VALUES('" + this.IdTRansaction + "','" + this.MontantTransaction + "','" + this.DateTransaction + "','" + this.IdCompte_1 + "','" + this.IdCompte_2 + "');";
-            st.executeUpdate(query);
+          compte compte = new compte();
+          Somme = compte.getSomme();
+            System.out.println( Somme);
+            System.out.println(IdCompte_2 + IdCompte_1);
+            System.out.println(this.IdCompte_2 + this.IdCompte_1);
+            String insertTran = "INSERT INTO transaction VALUES('" + this.IdTRansaction + "','" + Somme + "','" + now() + "','" + this.IdCompte_1 + "','" + this.IdCompte_2 + "');";
+            st.executeUpdate(insertTran);
             return true;
 
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-    }
+    }*/
+
+//*****************************************************************************************
 
     public void SelectTransaction() {
 
         try {
 
-            // notre requête SQL SELECT.
-            // si vous n'avez besoin que de quelques colonnes, spécifiez-les par nom au lieu d'utiliser "*"
-            String query = "SELECT * FROM  transaction";
-
-            // crée l'instruction java
+            String SelectTransaction = "SELECT * FROM  transaction";
             Statement st = con.createStatement();
-
-            // exécute la requête et obtient un ensemble de résultats java
-            ResultSet rs = st.executeQuery(query);
-
+            ResultSet rs = st.executeQuery(SelectTransaction);
             // itérer dans le jeu de résultats java
             while (rs.next()) {
                 int IdTRansaction = rs.getInt("IdTRansaction");
@@ -81,7 +75,7 @@ public class transaction extends compte {
 
                 // Afficher les résultats
                 System.out.println("Transaction : ");
-                System.out.format("%s, %s, %s, %s, %s\n","IdTRansaction : " + IdTRansaction,"MontantTransaction : " + MontantTransaction, "Date de Transaction : " + DateTransaction, "IdCompte_1 : " + IdCompte_1, "IdCompte_2 : " + IdCompte_2);
+                System.out.format("%s, %s, %s, %s, %s\n", "IdTRansaction : " + IdTRansaction, "MontantTransaction : " + MontantTransaction, "Date de Transaction : " + DateTransaction, "IdCompte_1 : " + IdCompte_1, "IdCompte_2 : " + IdCompte_2);
                 System.out.println("-------------------------");
             }
             st.close();
@@ -91,12 +85,15 @@ public class transaction extends compte {
         }
     }
 
+//*****************************************************************************************************************************
     // Résultats de la recherche avec les données des disques avec un choix de génération
-    public void selectIdTransaction(int para) {
+
+    public void selectIdTransaction() {
 
         try {
 
-            String query = "SELECT * FROM transaction WHERE IdTRansaction = '" + para + "'";
+            String query = "SELECT * FROM transaction WHERE IdTRansaction = ( SELECT MAX(IdTRansaction) FROM transaction)";
+
             rs = st.executeQuery(query);
             while (rs.next()) {
                 String IdTRansaction = rs.getString("IdTRansaction");
@@ -105,11 +102,11 @@ public class transaction extends compte {
                 int IdCompte_1 = rs.getInt("IdCompte_1");
                 int IdCompte_2 = rs.getInt("IdCompte_2");
                 System.out.format(
-                        "\nId Client : " + IdTRansaction +
-                                "\nNumeroAgence : " + MontantTransaction +
-                                "\nLibelle : " + DateTransaction +
-                                "\nAdresseAgence : " + IdCompte_1 +
-                                "\nVilleAgence : " + IdCompte_2);
+                        "\nId Transaction : " + IdTRansaction +
+                                "\nMontant transaction : " + MontantTransaction +
+                                "\nDate de transaction : " + DateTransaction +
+                                "\nId Compte 1 : " + IdCompte_1 +
+                                "\nId Compte 2 : " + IdCompte_2);
             }
             st.close();
         } catch (SQLException ex) {
@@ -118,10 +115,11 @@ public class transaction extends compte {
 
     }
 
+//*******************************************************************************************************************
+
     public boolean deleteTransaction(int id) {
 
         try {
-
             String query = "DELETE FROM transaction WHERE IdTRansaction = '" + id + "'";
             st.executeUpdate(query);
             return true;
@@ -131,10 +129,11 @@ public class transaction extends compte {
         }
     }
 
+//*************************************************************************************************************************
+
     public boolean updateTransaction(int IdTRansaction, float MontantTransaction, String DateTransaction, int IdCompte_1, int IdCompte_2) {
 
         try {
-
             String query = "UPDATE transaction SET"
                     + " MontantTransaction = '" + MontantTransaction + "',"
                     + " DateTransaction = '" + DateTransaction + "',"
@@ -146,47 +145,5 @@ public class transaction extends compte {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public int getIdCompte_1() {
-        return IdCompte_1;
-    }
-
-    public float getMontantTransaction() {
-        return MontantTransaction;
-    }
-
-    public void CrediterCompte( int IdCompte) {
-
-        try {
-
-            String query = "UPDATE compte SET Solde = Solde + 200 WHERE IdClient = IdClient;";
-            st.executeUpdate(query);
-            selectIdCompte(IdCompte);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void DebitCompte( int IdCompte) {
-
-        try {
-
-            String query = "UPDATE compte SET Solde = Solde - 200 WHERE IdClient = IdClient;";
-            st.executeUpdate(query);
-            selectIdCompte(IdCompte);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public int getIdCompte() {
-        return IdCompte_1;
-    }
-    public int getIdCompte_2() {
-        return IdCompte_2;
     }
 }
