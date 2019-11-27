@@ -8,21 +8,20 @@ import static java.time.LocalDateTime.now;
 
 public class compte {
 
-    private int IdCompte = 0;
-    private int IdCompte_1 = 0;
-    private int IdCompte_2 = 0;
-    private int IdClient = 0;
-    private int IdAgence = 0;
-    private int IdTRansaction = 0;
-    private float Solde = 0;
-    private float Somme = 0;
     private Connection con;
     private Statement st;
     private ResultSet rs;
+    private int IdCompte;
+    private int IdCompte_1;
+    private int IdCompte_2;
+    private int IdClient;
+    private int IdAgence;
+    private int IdTRansaction = 0;
+    private float Solde;
+    private float Somme;
     static Scanner key = new Scanner(System.in);
-    boolean fin = true;
-    private float MontantTransaction;
-
+    transaction transaction = new transaction();
+    private boolean SuppresionCompte = true;
 
     //********************* Connection *********************************************
 
@@ -39,83 +38,13 @@ public class compte {
         }
     }
 
-    public void interactionCompte() {
-
-        while (fin) {
-            System.out.println("");
-            System.out.println("         __________________________________________      ");
-            System.out.println("                       [| Bienvenu  |]                   ");
-            System.out.println("      +-------------------  Menu  --------------------+  ");
-            System.out.println("      | Quelle operation voulez-vous effectuer?       |  ");
-            System.out.println("      |  0) Supprimer compte(s) à 0€                  |  ");
-            System.out.println("      |  1) Ajouter un Compte                         |  ");
-            System.out.println("      |  2) Afficher tous les Comptes                 |  ");
-            System.out.println("      |  3) Afficher un Compte                        |  ");
-            System.out.println("      |  4) Modifier Compte                           |  ");
-            System.out.println("      |  5) supprimer un Compte                       |  ");
-            System.out.println("      |  6) Debiter Compte                            |  ");
-            System.out.println("      |  7) Crediter Compte                           |  ");
-            System.out.println("      |  8) Virement Compte                           |  ");
-            System.out.println("      |                                               |  ");
-            System.out.println("      |  9) Menu Principal                            |  ");
-            System.out.println("      +-----------------------------------------------+  ");
-            System.out.print("Votre choix: ");
-            String reponse = key.nextLine();
-            System.out.println();
-
-            switch (reponse) {
-                case "1":
-                    insertCompte();
-                    break;
-
-                case "2":
-                    selectCompte();
-                    break;
-
-                case "3":
-                    selectIdCompteV(IdCompte);
-                    break;
-
-                case "4":
-                    updateCompte();
-                    break;
-
-                case "5":
-                    deleteCompte();
-                    break;
-
-                case "6":
-                    debiter();
-                    break;
-
-                case "7":
-                    crediter();
-                    break;
-
-                case "8":
-                    virement();
-                    break;
-
-                case "9":
-                    Main MenuP = new Main();
-                    MenuP.MenuP();
-                    break;
-
-                default:
-                    System.out.println("Erreur de saisi clavier !! \n");
-                    break;
-            }
-        }
-    }
-
     //********************* Insertion *********************************************
-    // Insérez un nouveau client dans la base de données
+    // Insérez un nouveau Compte dans la base de données
 
     public boolean insertCompte() {
 
         try {
-            /*System.out.print("Saisissez le Solde  : ");
-            this.Solde = Float.parseFloat(key.nextLine());*/
+
             this.Solde = 50;
             System.out.print("Saisissez le Numero d'agence  : ");
             this.IdAgence = Integer.parseInt(key.nextLine());
@@ -134,11 +63,12 @@ public class compte {
         }
     }
 
-    //********************* Select *********************************************
+    //********************* Select un compte *********************************************
 
     public void selectCompte() {
 
         try {
+
             String query = "SELECT * FROM compte";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
@@ -149,7 +79,6 @@ public class compte {
                 String IdAgence = rs.getString("IdAgence");
                 String IdClient = rs.getString("IdClient");
 
-                System.out.format("%s, %s, %s, %s\n","IdCompte : " + IdCompte,"Solde : " + Solde,"IdAgence : " + IdAgence,"IdClient : " + IdClient);
             }
             st.close();
         } catch (Exception e) {
@@ -158,11 +87,12 @@ public class compte {
         }
     }
 
-//********************************************************************************************************************
+//***************************************Select par ID avec parametre****************************************
 
     public void selectIdCompteV(int Compte) {
 
         try {
+
             String query = "SELECT * FROM compte WHERE IdCompte = '" + Compte + "'";
             rs = st.executeQuery(query);
 
@@ -173,7 +103,7 @@ public class compte {
                 int IdAgence = rs.getInt("IdAgence");
                 System.out.format(
                         "\nIdCompte: " + IdCompte +
-                                "\nSolde : " + Solde +
+                                "\nSolde : " + Solde + " € " +
                                 "\nID Client : " + IdClient +
                                 "\nNumero Agence : " + IdAgence);
             }
@@ -182,8 +112,7 @@ public class compte {
         }
     }
 
-    //********************* SelectCompte par ID *********************************************
-    // Résultats de la recherche avec les données des disques avec un choix de génération
+    //***************************** SelectCompte par ID sans paramentre***********************************
 
     public void selectIdCompte() {
 
@@ -191,6 +120,7 @@ public class compte {
         this.IdCompte = Integer.parseInt(key.nextLine());
 
         try {
+
             String query = "SELECT * FROM compte WHERE IdCompte = '" + IdCompte + "'";
             rs = st.executeQuery(query);
             while (rs.next()) {
@@ -200,7 +130,7 @@ public class compte {
                 int IdAgence = rs.getInt("IdAgence");
                 System.out.format(
                         "\nIdCompte: " + IdCompte +
-                                "\nSolde : " + Solde +
+                                "\nSolde : " + Solde + " € " +
                                 "\nID Client : " + IdClient +
                                 "\nNumero Agence : " + IdAgence);
             }
@@ -209,47 +139,10 @@ public class compte {
         }
     }
 
-    //********************* modifier *********************************************
-
-    public boolean updateCompte() {
-
-        System.out.print("Saisissez l'Id du Compte  : ");
-        this.IdCompte = Integer.parseInt(key.nextLine());
-        System.out.print("Saisissez le nouveau Solde  : ");
-        this.Solde = Float.parseFloat(key.nextLine());
-
-        try {
-            String query = "UPDATE compte SET"
-                    + " Solde = '" + Solde
-                    + "' WHERE IdCompte = '" + IdCompte + "';";
-            st.executeUpdate(query);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    //********************* Delete *********************************************
-
-    public boolean deleteCompte() {
-
-        System.out.print("Saisissez l'Id du Compte a supprimer  : ");
-        this.IdCompte = Integer.parseInt(key.nextLine());
-
-        try {
-            String query = "DELETE FROM compte WHERE IdCompte = '" + IdCompte + "'";
-            st.executeUpdate(query);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    //*****************************************************************************
+    //******************************* Virement **********************************************
 
     public void virement() {
+
         System.out.print("Saisissez le Montant  : ");
         this.Somme = Float.parseFloat(key.nextLine());
         System.out.print("Saisissez l'Id du Compte a crediter : ");
@@ -259,30 +152,38 @@ public class compte {
 
         try {
 
-            String req = "SELECT Solde FROM compte WHERE IdCompte = '" + IdCompte_1 + "'";
-            rs = st.executeQuery(req);
-            while (rs.next()) {
-                String Solde = rs.getString("Solde");
-            }
-            if ((Solde - Somme) >= 0) {
-                selectIdCompteV(IdCompte_1);
-                System.out.println(" ");
-                selectIdCompteV(IdCompte_2);
-                System.out.println(" ");
-                String Credit = "UPDATE compte SET Solde = Solde + '" + Somme + "' WHERE IdCompte = '" + IdCompte_1 + "';";
-                st.executeUpdate(Credit);
-                String Debit = "UPDATE compte SET Solde = Solde - '" + Somme + "' WHERE IdCompte = '" + IdCompte_2 + "';";
-                st.executeUpdate(Debit);
-                selectIdCompteV(IdCompte_1);
-                System.out.println(" ");
-                selectIdCompteV(IdCompte_2);
-                transaction transaction = new transaction();
-                String insertTran = "INSERT INTO transaction VALUES('" + this.IdTRansaction + "','" + Somme + "','" + now() + "','" + this.IdCompte_1 + "','" + this.IdCompte_2 + "');";
-                st.executeUpdate(insertTran);
-                System.out.println(" ");
-                transaction.selectIdTransaction();
-            } else {
-                System.out.println("Solde insuffisant");
+            String req = "SELECT Solde FROM compte WHERE IdCompte = '" + IdCompte_2 + "'";
+            Statement sta = con.createStatement();
+            ResultSet res = sta.executeQuery(req);
+
+            while (res.next()) {
+
+                float Solde = res.getFloat("Solde");
+                System.out.println("Le montant du compte a debiter est de : " + Solde + " € ");
+
+                if ((Solde - Somme) >= 0) {
+
+                    selectIdCompteV(IdCompte_1);
+                    System.out.println("Compte avant virement");
+                    selectIdCompteV(IdCompte_2);
+                    System.out.println("Compte avant virement ");
+                    String Credit = "UPDATE compte SET Solde = Solde + '" + Somme + "' WHERE IdCompte = '" + IdCompte_1 + "';";
+                    st.executeUpdate(Credit);
+                    String Debit = "UPDATE compte SET Solde = Solde - '" + Somme + "' WHERE IdCompte = '" + IdCompte_2 + "';";
+                    st.executeUpdate(Debit);
+                    selectIdCompteV(IdCompte_1);
+                    System.out.println("Compte apres virement ");
+                    selectIdCompteV(IdCompte_2);
+                    System.out.println("Compte apres virement ");
+                    String insertTran = "INSERT INTO transaction VALUES('" + this.IdTRansaction + "','" + Somme + "','" + now() + "','" + this.IdCompte_1 + "','" + this.IdCompte_2 + "');";
+                    st.executeUpdate(insertTran);
+                    System.out.println(" ");
+                    transaction.selectIdTransaction();
+
+                } else {
+
+                    System.out.println("Solde insuffisant");
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -291,55 +192,96 @@ public class compte {
         }
     }
 
-    //**************************************************************************
+//***************************** supprimer les comptes a zero ************************************************
 
-    public void crediter() {
-
-        System.out.print("Saisissez l'Id du Compte a crediter : ");
-        this.IdCompte = Integer.parseInt(key.nextLine());
-        System.out.print("Saisissez le Montant  : ");
-        this.Somme = Float.parseFloat(key.nextLine());
+    public void AfficherCompteZero() {
 
         try {
-            String Credit = "UPDATE compte SET Solde = Solde + '" + Somme + "' WHERE IdCompte = '" + IdCompte + "';";
-            st.executeUpdate(Credit);
-            selectIdCompteV(IdCompte);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    //*****************************************************************************
+            while (SuppresionCompte) {
 
-    public void debiter() {
+                System.out.println("");
+                System.out.println("      +-------------- Menu suppression ------------------+  ");
+                System.out.println("      | Quelle operation voulez-vous effectuer?          |  ");
+                System.out.println("      |                                                  |  ");
+                System.out.println("      |  1) Afficher tous les Comptes a zero par agence  |  ");
+                System.out.println("      |  2) Afficher tous les Comptes a zero d'un client |  ");
+                System.out.println("      |  3) Supprimer un compte a zero                   |  ");
+                System.out.println("      |                                                  |  ");
+                System.out.println("      |  4) Menu Agence                                  |  ");
+                System.out.println("      +--------------------------------------------------+  ");
+                System.out.println("");
+                System.out.print("Votre choix: ");
+                String reponse1 = key.nextLine();
+                System.out.println();
+                switch (reponse1) {
 
-        System.out.print("Saisissez l'Id du Compte a debiter: ");
-        this.IdCompte = Integer.parseInt(key.nextLine());
-        System.out.print("Saisissez le Montant  : ");
-        this.Somme = Float.parseFloat(key.nextLine());
+                    case "1":
+                        System.out.print("Saisissez l'Id de l'agence : ");
+                        this.IdAgence = Integer.parseInt(key.nextLine());
+                        String CZ = "SELECT * FROM  projetbanque2.compte " +
+                                "WHERE  Solde = 0 AND IdAgence =  '" + IdAgence + "';";
+                        rs = st.executeQuery(CZ);
 
-            try {
-                selectIdCompte();
-                String Debit = "UPDATE compte SET Solde = Solde - '" + Somme + "' WHERE IdCompte = '" + IdCompte + "';";
-                st.executeUpdate(Debit);
-                selectIdCompteV(IdCompte);
-            } catch (Exception e) {
-                e.printStackTrace();
+                        while (rs.next()) {
+                            int IdCompte = rs.getInt("IdCompte");
+                            String Solde = rs.getString("Solde");
+
+                            String IdClient = rs.getString("IdClient");
+                            int IdAgence = rs.getInt("IdAgence");
+                            System.out.format(
+                                    "\nIdCompte: " + IdCompte +
+                                            "\nSolde : " + Solde + " € " +
+                                            "\nID Client : " + IdClient +
+                                            "\nNumero Agence : " + IdAgence);
+                            System.out.println("");
+                        }
+
+                        break;
+
+                    case "2":
+
+                        System.out.print("Saisissez l'Id du client  : ");
+                        this.IdClient = Integer.parseInt(key.nextLine());
+
+                        String query = "SELECT * FROM  projetbanque2.compte " +
+                                "INNER JOIN clients on projetbanque2.clients.IdClient = projetbanque2.compte.IdClient " +
+                                "WHERE  Solde = 0 AND projetbanque2.compte.IdClient =  '" + IdClient + "';";
+                        rs = st.executeQuery(query);
+
+                        while (rs.next()) {
+                            int IdCompte = rs.getInt("IdCompte");
+                            String Solde = rs.getString("Solde");
+
+                            String IdClient = rs.getString("IdClient");
+                            int IdAgence = rs.getInt("IdAgence");
+                            System.out.format(
+                                    "\nIdCompte: " + IdCompte +
+                                            "\nSolde : " + Solde + " € " +
+                                            "\nID Client : " + IdClient +
+                                            "\nNumero Agence : " + IdAgence);
+                            System.out.println("");
+                        }
+                        break;
+
+                    case "3":
+
+                        System.out.print("Saisissez l'Id du Compte  a supprimer : ");
+                        this.IdCompte = Integer.parseInt(key.nextLine());
+
+                        String Delete = "DELETE FROM compte WHERE Solde = 0 AND projetbanque2.compte.IdCompte =  '" + IdCompte + "'";
+                        st.executeUpdate(Delete);
+                        System.out.println("Le compte a etait supprimer !");
+                        break;
+
+                    case "4":
+
+                        SuppresionCompte = false;
+                        break;
+                }
             }
-    }
-
-    //**************************************************************************
-    public int getIdCompte() {
-        return IdCompte;
-    }
-    public int getIdCompte1() {
-        return IdCompte_1;
-    }
-    public int getIdCompte2() {
-        return IdCompte_2;
-    }
-
-    public float getSomme() {
-        return Somme;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }

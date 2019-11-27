@@ -6,18 +6,19 @@ import java.util.Scanner;
 
 public class agence {
 
-    private int IdAgence = 0;
-    private String Libelle;
-    private String AdresseAgence;
-    private String DepartementAgence;
-    private String VilleAgence;
     private Connection con;
     private Statement st;
     private ResultSet rs;
+    private int IdAgence = 0;
     static Scanner key = new Scanner(System.in);
-    boolean fini = true;
+    boolean MenuAgence = true;
+    client client = new client();
+    compte compte = new compte();
+    transaction transaction = new transaction();
+    private boolean Suppresion = true;
+    private boolean compteClient = true;
 
-//**********************************************************************************************************
+//***************************************** Connection *****************************************************************
 
     public agence() {
         try {
@@ -31,102 +32,192 @@ public class agence {
         }
     }
 
-//***********************************************************************************************************
+//*********************************** Menu Agence ************************************************************************
 
     public void interactionAgence() {
-        while (fini) {
+
+        while (MenuAgence) {
             System.out.println("");
             System.out.println("         __________________________________________      ");
-            System.out.println("                       [| Bienvenu  |]                   ");
+            System.out.println("                       [| Bienvenue  |]                  ");
             System.out.println("      +-------------------  Menu  --------------------+  ");
             System.out.println("      | Quelle operation voulez-vous effectuer?       |  ");
-            System.out.println("      |  1) Ajouter une Agence                        |  ");
-            System.out.println("      |  2) Afficher toutes les agences               |  ");
-            System.out.println("      |  3) Afficher une agence                       |  ");
-            System.out.println("      |  4) Modifier Agence                           |  ");
-            System.out.println("      |  5) supprime agence                           |  ");
             System.out.println("      |                                               |  ");
-            System.out.println("      |  6) Menu Principal                            |  ");
+            System.out.println("      |  1) Afficher toutes les agences               |  ");
+            System.out.println("      |  2) Afficher une agence                       |  ");
+            System.out.println("      |                                               |  ");
+            System.out.println("      |  3) Crée un client                            |  ");
+            System.out.println("      |  4) Afficher touts les Clients                |  ");
+            System.out.println("      |  5) Afficher information client               |  ");
+            System.out.println("      |                                               |  ");
+            System.out.println("      |  6) Crée un compte                            |  ");
+            System.out.println("      |  7) Afficher tous les Comptes                 |  ");
+            System.out.println("      |  8) Afficher un Compte                        |  ");
+            System.out.println("      |  9) Virement entre Comptes                    |  ");
+            System.out.println("      | 10) Information compte(s) à 0€                |  ");
+            System.out.println("      |                                               |  ");
+            System.out.println("      | 13) Afficher toutes les transactions          |  ");
+            System.out.println("      | 14) transaction liée a une Agence             |  ");
+            System.out.println("      | 15) transaction liée a un Compte              |  ");
+            System.out.println("      |                                               |  ");
+            System.out.println("      | 16) Quitter le programme                      |  ");
             System.out.println("      +-----------------------------------------------+  ");
             System.out.print("Votre choix: ");
             String reponse = key.nextLine();
             System.out.println();
 
             switch (reponse) {
-                case "1":
-                    insertAgence();
-                    break;
 
-                case "2":
+                case "1":
                     SelectAgence();
                     break;
 
-                case "3":
+                case "2":
                     selectIdAgence();
                     break;
 
+                case "3":
+                    client.insertClient();
+                    break;
+
                 case "4":
-                    updateAgence();
+                    client.selectClient();
                     break;
 
                 case "5":
-                    deleteAgence();
+
+                    while (compteClient) {
+
+                        System.out.println("");
+                        System.out.println("      +-------------- Menu suppression ---------------+  ");
+                        System.out.println("      | Quelle operation voulez-vous effectuer?       |  ");
+                        System.out.println("      |                                               |  ");
+                        System.out.println("      |  1) Afficher un client                        |  ");
+                        System.out.println("      |  2) Afficher tous les comptes liée au client  |  ");
+                        System.out.println("      |  3) Modifier un client                        |  ");
+                        System.out.println("      |  4) Supprimer un client                       |  ");
+                        System.out.println("      |                                               |  ");
+                        System.out.println("      |  5) Menu Agence                               |  ");
+                        System.out.println("      +-----------------------------------------------+  ");
+                        System.out.println("");
+                        System.out.print("Votre choix: ");
+                        String reponse1 = key.nextLine();
+                        System.out.println();
+                        switch (reponse1) {
+
+                            case "1":
+                                client.selectIdClient();
+                                break;
+
+                            case "2":
+                                client.selectClientCompte();
+                                break;
+
+                            case "3":
+                                client.updateClient();
+                                break;
+
+                            case "4":
+                                client.deleteClient();
+                                break;
+
+                            case "5":
+                                Suppresion = false;
+                                break;
+                        }
+                    }
                     break;
 
                 case "6":
-                    Main MenuP = new Main();
-                    MenuP.MenuP();
+                    compte.insertCompte();
+                    break;
+
+                case "7":
+                    compte.selectCompte();
+                    break;
+
+                case "8":
+                    compte.selectIdCompte();
+                    break;
+
+                case "9":
+                    compte.virement();
+                    break;
+
+                case "10":
+                    compte.AfficherCompteZero();
+                    break;
+
+                case "13":
+                    transaction.SelectTransaction();
+                    break;
+
+                case "14":
+                    SelectTransactionAgence();
+                    break;
+
+                case "15":
+                    transaction.SelectTransactionCompte();
+                    break;
+
+                case "16":
+                    MenuAgence = false;
+                    System.out.println("au revoir ! a la prochaine ");
                     break;
 
                 default:
-                    System.out.println("Erreur de saisi clavier !! \n");
+                    System.out.println("Erreur de saisie clavier !! \n");
                     break;
             }
         }
     }
 
-//*****************************************************************************************************
-    // Insérez un nouveau client dans la base de données
+    //****************************** Select Transaction par Agence ***************************************************************
 
-    public boolean insertAgence() {
+    public void SelectTransactionAgence() {
 
+        System.out.print("Saisissez l'Id Agence : ");
+        int agenceTemp = Integer.parseInt(key.nextLine());
         try {
 
-            System.out.print("Saisissez le libelle  : ");
-            this.Libelle = key.nextLine();
-            System.out.print("Saisissez l'adresse de l'agence   : ");
-            this.AdresseAgence = key.nextLine();
-            System.out.print("Saisissez lae departement  : ");
-            this.DepartementAgence = key.nextLine();
-            System.out.print("Saisissez la ville  : ");
-            this.VilleAgence = key.nextLine();
+            String query = "SELECT * FROM  projetbanque2.agence " +
+                    "INNER JOIN compte on agence.IdAgence = projetbanque2.compte.IdAgence " +
+                    "INNER JOIN transaction on projetbanque2.compte.IdCompte = projetbanque2.transaction.IdCompte_1 " +
+                    "or projetbanque2.compte.IdCompte = projetbanque2.transaction.IdCompte_2 " +
+                    "WHERE projetbanque2.compte.IdAgence =  '" + agenceTemp + "';";
 
-            String query = "INSERT INTO agence VALUES('" + this.IdAgence + "','" + this.Libelle + "','" + this.AdresseAgence + "','" + this.DepartementAgence + "','" + this.VilleAgence + "');";
-            st.executeUpdate(query);
-            SelectAgence();
-            return true;
+            Statement stat = con.createStatement();
+            ResultSet res = stat.executeQuery(query);
+
+            while (res.next()) {
+                int IdAgence = res.getInt("IdAgence");
+                int IdCompte_1 = res.getInt("IdCompte_1");
+                int IdCompte_2 = res.getInt("IdCompte_2");
+                String DateTransaction = res.getString("DateTransaction");
+                String MontantTransaction = res.getString("MontantTransaction");
+
+                // Afficher les résultats
+                System.out.println(" ");
+                System.out.format(" %s, %s, %s, %s, %s\n", "Agence : " + IdAgence, "Compte Crediteur : " + IdCompte_1, "Compte Debiteur : " + IdCompte_2, "Date transaction : " + DateTransaction, "Montant Transaction : " + MontantTransaction);
+                System.out.println("-------------------------");
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            System.err.println("Vous avez une exception!");
+            System.err.println(e.getMessage());
         }
     }
 
-//*********************************************************************************************
+//************************************ Select toutes les agences *********************************************************
 
     public void SelectAgence() {
 
         try {
 
             String query = "SELECT * FROM  agence";
-
-            // crée l'instruction java
             Statement st = con.createStatement();
-
-            // exécute la requête et obtient un ensemble de résultats java
             ResultSet rs = st.executeQuery(query);
 
-            // itérer dans le jeu de résultats java
             while (rs.next()) {
                 int IdAgence = rs.getInt("IdAgence");
                 String Libelle = rs.getString("Libelle");
@@ -138,6 +229,8 @@ public class agence {
                 System.out.println("Agence : ");
                 System.out.format("%s, %s, %s, %s, %s\n", "NumeroAgence : " + IdAgence, "libelle : " + Libelle, "AdresseAgence : " + AdresseAgence, "DepartementAgence : " + DepartementAgence, "VilleAgence : " + VilleAgence);
                 System.out.println("-------------------------");
+                System.out.println(" ");
+
             }
 
         } catch (Exception e) {
@@ -146,8 +239,7 @@ public class agence {
         }
     }
 
-//*****************************************************************************************************
-    // Résultats de la recherche avec les données des disques avec un choix de génération
+//************************************* Select agence par ID ****************************************************************
 
     public void selectIdAgence() {
 
@@ -173,56 +265,6 @@ public class agence {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-        }
-    }
-
-//*********************************************************************************************
-
-    public boolean updateAgence() {
-
-        System.out.print("Saisissez l'Id Agence  : ");
-        this.IdAgence = Integer.parseInt(key.nextLine());
-        System.out.print("Saisissez le libelle  : ");
-        this.Libelle = key.nextLine();
-        System.out.print("Saisissez l'adresse de l'agence   : ");
-        this.AdresseAgence = key.nextLine();
-        System.out.print("Saisissez le departement  : ");
-        this.DepartementAgence = key.nextLine();
-        System.out.print("Saisissez la ville  : ");
-        this.VilleAgence = key.nextLine();
-
-        try {
-
-            String query = "UPDATE agence SET"
-                    + " Libelle = '" + Libelle + "',"
-                    + " AdresseAgence = '" + AdresseAgence + "',"
-                    + " DepartementAgence = '" + DepartementAgence + "',"
-                    + " VilleAgence = '" + VilleAgence + "' WHERE IdAgence = '" + IdAgence + "';";
-            st.executeUpdate(query);
-            SelectAgence();
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-//*****************************************************************************************************
-
-    public boolean deleteAgence() {
-
-        System.out.print("Saisissez l'Id Agence a supprimer  : ");
-        this.IdAgence = Integer.parseInt(key.nextLine());
-
-        try {
-
-            String query = "DELETE FROM agence WHERE IdAgence = '" + IdAgence + "'";
-            st.executeUpdate(query);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
 }
